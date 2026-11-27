@@ -1,0 +1,2828 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>FinControl — Dashboard Financeiro (Nov/2026–Dez/2027)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-canvas: #eef2f6;
+      --card: #ffffff;
+      --soft: #f6f8fb;
+      --border: #e2e8f0;
+
+      --ink: #0f172a;
+      --ink-sec: #475569;
+      --ink-dim: #94a3b8;
+
+      --grad-emerald: linear-gradient(135deg, #10b981 0%, #047857 100%);
+      --grad-teal: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+      --grad-rose: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+      --grad-indigo: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+      --grad-header: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+
+      --emerald: #059669;
+      --emerald-soft: #ecfdf5;
+      --indigo-soft: #eef2ff;
+      --indigo-ink: #4338ca;
+      --rose: #e11d48;
+
+      --sim-bg: linear-gradient(135deg, #f0f9ff 0%, #eef2ff 100%);
+      --sim-border: #dbeafe;
+      --sim-divider: rgba(99, 102, 241, 0.14);
+
+      --radius-lg: 14px;
+      --radius-md: 9px;
+      --shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.05), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+    }
+
+    body[data-theme="dark"] {
+      color-scheme: dark;
+      --bg-canvas: #090d16;
+      --card: #111827;
+      --soft: #182234;
+      --border: #263349;
+
+      --ink: #f1f5f9;
+      --ink-sec: #94a3b8;
+      --ink-dim: #64748b;
+
+      --grad-header: linear-gradient(135deg, #0b1120 0%, #172033 100%);
+
+      --emerald: #34d399;
+      --emerald-soft: rgba(16, 185, 129, 0.16);
+      --indigo-soft: rgba(99, 102, 241, 0.2);
+      --indigo-ink: #a5b4fc;
+      --rose: #fb7185;
+
+      --sim-bg: linear-gradient(135deg, #131e33 0%, #191d38 100%);
+      --sim-border: #273654;
+      --sim-divider: rgba(129, 140, 248, 0.22);
+
+      --shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.45), 0 2px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
+    }
+
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 10px 14px 20px;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    body.app-locked .dashboard {
+      filter: blur(14px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .dashboard {
+      width: 100%;
+      max-width: 1420px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+      overflow-x: clip;
+      transition: filter 0.2s ease;
+    }
+
+    .dashboard > *,
+    .kpi-grid > *,
+    .analytics-grid > *,
+    .lower-grid > *,
+    .side-stack > *,
+    .panel,
+    .ledger-card,
+    .quick-form > *,
+    .sim-grid > *,
+    .sim-f,
+    .modal-grid > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .top-command {
+      background: var(--grad-header);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 8px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 10px 22px -6px rgba(15, 23, 42, 0.22);
+      overflow: visible;
+      position: relative;
+      z-index: 30;
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .brand-area > div {
+      min-width: 0;
+    }
+
+    .brand-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--grad-emerald);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .brand-area h1 {
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      overflow-wrap: anywhere;
+    }
+
+    .month-menu-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      position: relative;
+    }
+
+    .month-menu-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+
+    .month-picker {
+      position: relative;
+      min-width: 164px;
+    }
+
+    .month-trigger {
+      width: 100%;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background-color: #1e293b;
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .month-trigger:hover,
+    .month-trigger:focus-visible {
+      background-color: #273549;
+      border-color: rgba(255, 255, 255, 0.34);
+    }
+
+    body[data-theme="dark"] .month-trigger {
+      background-color: #0b1120;
+      border-color: #263349;
+      color: #f1f5f9;
+    }
+
+    body[data-theme="dark"] .month-trigger:hover,
+    body[data-theme="dark"] .month-trigger:focus-visible {
+      background-color: #111827;
+      border-color: #6366f1;
+    }
+
+    .month-caret {
+      font-size: 0.62rem;
+      opacity: 0.8;
+      transition: transform 0.15s ease;
+    }
+
+    .month-picker.open .month-caret {
+      transform: rotate(180deg);
+    }
+
+    .month-dropdown {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 184px;
+      max-height: 260px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background-color: #0f172a;
+      color: #f8fafc;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.55);
+      padding: 4px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 120;
+    }
+
+    .month-picker.open .month-dropdown {
+      display: flex;
+    }
+
+    body[data-theme="dark"] .month-dropdown {
+      background-color: #090d16;
+      border-color: #263349;
+      color: #f1f5f9;
+    }
+
+    .month-option {
+      width: 100%;
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      color: #e2e8f0;
+      padding: 6px 9px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .month-option:hover {
+      background-color: #182234;
+      color: #ffffff;
+    }
+
+    .month-option.active {
+      background-color: rgba(99, 102, 241, 0.24);
+      color: #a5b4fc;
+      font-weight: 800;
+    }
+
+    .top-tools {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .btn-ghost {
+      height: 26px;
+      padding: 0 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.07);
+      color: #f8fafc;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      max-width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .btn-ghost.icon-only {
+      width: 26px;
+      padding: 0;
+      font-size: 0.78rem;
+    }
+
+    .btn-ghost.active-privacy {
+      background: rgba(99, 102, 241, 0.35);
+      border-color: rgba(165, 180, 252, 0.55);
+      color: #ffffff;
+    }
+
+    .theme-switch {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      border-radius: 9px;
+      background: rgba(2, 6, 23, 0.42);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .theme-opt {
+      width: 24px;
+      height: 22px;
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      color: rgba(248, 250, 252, 0.65);
+      font-size: 0.78rem;
+      line-height: 1;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .theme-opt:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .theme-opt.active[data-mode="light"] {
+      background: linear-gradient(135deg, #fef08a 0%, #f59e0b 100%);
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+    }
+
+    .theme-opt.active[data-mode="dark"] {
+      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .kpi-card {
+      position: relative;
+      border-radius: 13px;
+      padding: 9px 12px;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 8px 18px -6px rgba(15, 23, 42, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 4px;
+      overflow: hidden;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0) 60%);
+      pointer-events: none;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px -6px rgba(15, 23, 42, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.36);
+    }
+
+    body[data-theme="dark"] .kpi-card {
+      border-color: rgba(255, 255, 255, 0.14);
+      box-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    .kpi-card.g-emerald { background: var(--grad-emerald); }
+    .kpi-card.g-teal { background: var(--grad-teal); }
+    .kpi-card.g-indigo { background: var(--grad-indigo); }
+    .kpi-card.g-rose { background: var(--grad-rose); }
+
+    .kpi-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.67rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.95);
+      min-width: 0;
+    }
+
+    .kpi-top > span:first-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .kpi-pill {
+      background: rgba(15, 23, 42, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 0.59rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .kpi-val {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(0.98rem, 1.18vw, 1.16rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.12;
+      overflow-wrap: anywhere;
+    }
+
+    .kpi-sub {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2px 8px;
+      font-size: 0.63rem;
+      font-weight: 600;
+      line-height: 1.25;
+      color: rgba(255, 255, 255, 0.9);
+      padding-top: 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-sub > span {
+      overflow-wrap: anywhere;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
+      gap: 10px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 10px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .panel-head h2 {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      overflow-wrap: anywhere;
+    }
+
+    .panel-head span {
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--ink-dim);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .rank-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .rank-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .rank-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      min-width: 0;
+    }
+
+    .rank-info > span:first-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .rank-info > span:last-child {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .rank-track {
+      height: 5px;
+      border-radius: 999px;
+      background: var(--soft);
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .rank-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--grad-emerald);
+      max-width: 100%;
+    }
+
+    .evo-chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 96px;
+      padding-top: 8px;
+      border-bottom: 1px solid var(--border);
+      gap: 3px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .evo-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .evo-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 68px;
+    }
+
+    .bar-in {
+      width: 6px;
+      max-height: 64px;
+      border-radius: 3px 3px 1px 1px;
+      background: var(--grad-emerald);
+      transition: height 0.25s;
+    }
+
+    .bar-out {
+      width: 6px;
+      max-height: 64px;
+      border-radius: 3px 3px 1px 1px;
+      background: var(--grad-rose);
+      transition: height 0.25s;
+    }
+
+    .evo-lbl {
+      font-size: 0.56rem;
+      font-weight: 800;
+      color: var(--ink-sec);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 305px);
+      gap: 10px;
+      align-items: stretch;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .ledger-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      max-width: 100%;
+      width: 100%;
+      min-height: 0;
+    }
+
+    .ledger-bar {
+      padding: 8px 13px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .ledger-bar > div {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    #lblLedgerTitle {
+      white-space: nowrap;
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      background: var(--soft);
+      padding: 2px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      max-width: 100%;
+    }
+
+    .pill {
+      border: none;
+      background: transparent;
+      color: var(--ink-sec);
+      padding: 3px 9px;
+      border-radius: 8px;
+      font-size: 0.69rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .pill.active {
+      background: var(--card);
+      color: var(--ink);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+
+    .search-box {
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--soft);
+      color: var(--ink);
+      font-size: 0.72rem;
+      width: 160px;
+      max-width: 100%;
+      outline: none;
+    }
+
+    .search-box::placeholder {
+      color: var(--ink-dim);
+    }
+
+    .quick-form {
+      padding: 8px 13px;
+      background: var(--soft);
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.05fr) minmax(0, 108px) minmax(0, 68px) minmax(0, 82px) auto auto;
+      gap: 7px;
+      align-items: center;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .entry-input,
+    .entry-select {
+      width: 100%;
+      height: 30px;
+      padding: 0 9px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--ink);
+      font-size: 0.74rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      min-width: 0;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .entry-input::placeholder {
+      color: var(--ink-dim);
+    }
+
+    .entry-input:focus,
+    .entry-select:focus {
+      border-color: #059669;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.14);
+    }
+
+    .rec-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 30px;
+      padding: 0 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--ink-sec);
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .rec-check input {
+      accent-color: #4f46e5;
+      cursor: pointer;
+    }
+
+    .btn-emerald {
+      height: 30px;
+      padding: 0 12px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--grad-emerald);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+
+    .btn-emerald:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .table-scroll {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: visible;
+      flex: 1 1 auto;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .table-scroll table {
+      width: 100%;
+      min-width: 630px;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: var(--card);
+      color: var(--ink-dim);
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 6px 9px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 5px 9px;
+      border-bottom: 1px solid var(--soft);
+      font-size: 0.73rem;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+
+    tbody td.desc-c {
+      max-width: 280px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    tbody td.val-c {
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody td.act-c {
+      white-space: nowrap;
+      text-align: right;
+      width: 68px;
+      min-width: 68px;
+    }
+
+    tbody tr:hover td {
+      background: var(--soft);
+    }
+
+    tr.paid td.desc-c {
+      text-decoration: line-through;
+      color: var(--ink-dim);
+    }
+
+    tr.paid td.val-c {
+      opacity: 0.45;
+    }
+
+    .tag-q {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--ink-sec);
+      white-space: nowrap;
+    }
+
+    .tag-p {
+      font-size: 0.63rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--ink-sec);
+      white-space: nowrap;
+    }
+
+    .tag-p.end {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+    }
+
+    .tag-p.rec {
+      background: var(--indigo-soft);
+      color: var(--indigo-ink);
+    }
+
+    .c-pos { color: var(--emerald); }
+    .c-neg { color: var(--rose); }
+
+    .act-btn {
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--ink-sec);
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.72rem;
+      line-height: 1;
+      vertical-align: middle;
+    }
+
+    .act-btn:hover {
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    .act-btn.del {
+      color: var(--rose);
+      border-color: rgba(244, 63, 94, 0.35);
+      background: rgba(244, 63, 94, 0.1);
+      margin-left: 3px;
+    }
+
+    .act-btn.del:hover {
+      background: rgba(244, 63, 94, 0.2);
+    }
+
+    .side-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .relief-box {
+      background: var(--grad-emerald);
+      color: #fff;
+      border-radius: 11px;
+      padding: 8px 11px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    .relief-box span {
+      font-size: 0.7rem;
+      font-weight: 700;
+      opacity: 0.92;
+      overflow-wrap: anywhere;
+    }
+
+    .relief-box strong {
+      font-size: 0.96rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+
+    .end-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      border-radius: 8px;
+      background: var(--soft);
+      font-size: 0.71rem;
+      font-weight: 600;
+      min-width: 0;
+    }
+
+    .end-item > span:first-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .end-item > span:last-child {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .sim-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .sim-f {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .sim-f.full {
+      grid-column: 1 / -1;
+    }
+
+    .sim-f label {
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--ink-sec);
+      overflow-wrap: anywhere;
+    }
+
+    .sim-box-field {
+      width: 100%;
+      height: 30px;
+      padding: 0 9px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--ink);
+      font-size: 0.74rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      min-width: 0;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .sim-box-field:focus {
+      border-color: #059669;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.14);
+    }
+
+    .sim-out {
+      background: var(--sim-bg);
+      border: 1px solid var(--sim-border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .sim-r {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 3px 8px;
+      padding-top: 3px;
+      border-top: 1px solid var(--sim-divider);
+      min-width: 0;
+    }
+
+    .sim-r > span {
+      overflow-wrap: anywhere;
+    }
+
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 90;
+      padding: 14px;
+      overflow-y: auto;
+    }
+
+    .modal-bg.open { display: flex; }
+
+    .modal-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      width: 100%;
+      max-width: 360px;
+      max-height: calc(100dvh - 28px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .modal-grid .entry-input,
+    .modal-grid .entry-select {
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* Tela de Bloqueio PIN */
+    .lock-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 13, 22, 0.88);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 16px;
+    }
+
+    .lock-screen.open {
+      display: flex;
+    }
+
+    .lock-card {
+      width: 100%;
+      max-width: 340px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .lock-icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto;
+      border-radius: 12px;
+      background: var(--grad-indigo);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+    }
+
+    .lock-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .lock-sub {
+      font-size: 0.72rem;
+      color: var(--ink-sec);
+      line-height: 1.35;
+    }
+
+    .pin-input {
+      width: 100%;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--soft);
+      color: var(--ink);
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.28em;
+      outline: none;
+    }
+
+    .pin-input.plain-confirm {
+      letter-spacing: 0.04em;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .pin-input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    .pin-err {
+      min-height: 16px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--rose);
+    }
+
+    .lock-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .recovery-panel {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 11px;
+      background: var(--soft);
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .recovery-panel.open {
+      display: flex;
+    }
+
+    .recovery-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-link-dim {
+      border: none;
+      background: transparent;
+      color: var(--ink-dim);
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .btn-link-dim:hover {
+      color: var(--ink-sec);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1150px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .analytics-grid { grid-template-columns: minmax(0, 1fr); }
+      .lower-grid { grid-template-columns: minmax(0, 1fr); }
+      .quick-form { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 8px 8px 20px; }
+      .kpi-grid { grid-template-columns: minmax(0, 1fr); }
+      .quick-form { grid-template-columns: minmax(0, 1fr); }
+      .search-box { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <header class="top-command">
+      <div class="brand-area">
+        <div class="brand-badge">R$</div>
+        <div>
+          <h1>FinControl</h1>
+        </div>
+      </div>
+
+      <div class="month-menu-wrap">
+        <span class="month-menu-label">Mês:</span>
+        <div class="month-picker" id="monthPicker">
+          <button
+            type="button"
+            class="month-trigger"
+            id="monthTrigger"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-label="Selecionar mês"
+            onclick="toggleMonthDropdown(event)"
+          >
+            <span id="monthTriggerLabel">Novembro de 2026</span>
+            <span class="month-caret">▼</span>
+          </button>
+          <div class="month-dropdown" id="monthDropdown" role="listbox" aria-label="Meses disponíveis"></div>
+        </div>
+      </div>
+
+      <div class="top-tools">
+        <button type="button" class="btn-ghost" onclick="addMonth()">+ Mês</button>
+        <button type="button" class="btn-ghost" onclick="exportJson()">Exportar</button>
+        <button type="button" class="btn-ghost" onclick="document.getElementById('fileIn').click()">Importar</button>
+        <button type="button" class="btn-ghost" onclick="resetSeed()">Restaurar</button>
+        <button
+          type="button"
+          class="btn-ghost icon-only"
+          id="btnPrivacy"
+          title="Ocultar/mostrar valores"
+          aria-label="Ocultar ou mostrar valores"
+          onclick="togglePrivacy()"
+        >👁️</button>
+        <button
+          type="button"
+          class="btn-ghost icon-only"
+          id="btnPinCfg"
+          title="Configurar ou alterar PIN"
+          aria-label="Configurar ou alterar PIN"
+          onclick="openPinModal()"
+        >🔑</button>
+        <button
+          type="button"
+          class="btn-ghost icon-only"
+          id="btnLockNow"
+          title="Bloquear painel"
+          aria-label="Bloquear painel"
+          onclick="lockApp()"
+        >🔒</button>
+        <div class="theme-switch" role="group" aria-label="Tema">
+          <button type="button" class="theme-opt" data-mode="light" aria-label="Modo claro" onclick="applyTheme('light')">☀️</button>
+          <button type="button" class="theme-opt" data-mode="dark" aria-label="Modo escuro" onclick="applyTheme('dark')">🌙</button>
+        </div>
+        <input type="file" id="fileIn" accept=".json" style="display:none" onchange="importJson(event)" />
+      </div>
+    </header>
+
+    <section class="kpi-grid">
+      <div class="kpi-card g-teal" id="cardQ1">
+        <div class="kpi-top">
+          <span>Acumulado 1ª Quinzena</span>
+          <span class="kpi-pill" id="pillQ1">01–15</span>
+        </div>
+        <div class="kpi-val" id="valQ1">R$ 0,00</div>
+        <div class="kpi-sub" id="subQ1"></div>
+      </div>
+
+      <div class="kpi-card g-emerald" id="cardQ2">
+        <div class="kpi-top">
+          <span>Acumulado 2ª Quinzena</span>
+          <span class="kpi-pill" id="pillQ2">16–31</span>
+        </div>
+        <div class="kpi-val" id="valQ2">R$ 0,00</div>
+        <div class="kpi-sub" id="subQ2"></div>
+      </div>
+
+      <div class="kpi-card g-indigo" id="cardMonth">
+        <div class="kpi-top">
+          <span>Resultado do Mês</span>
+          <span class="kpi-pill" id="pendBadge">Pendente: R$ 0</span>
+        </div>
+        <div class="kpi-val" id="valMonth">R$ 0,00</div>
+        <div class="kpi-sub" id="subMonth"></div>
+      </div>
+
+      <div class="kpi-card g-emerald" id="cardAccum">
+        <div class="kpi-top">
+          <span>Saldo Acumulado</span>
+          <span class="kpi-pill" id="accumBadge">Nov/26–Dez/27</span>
+        </div>
+        <div class="kpi-val" id="valAccum">R$ 0,00</div>
+        <div class="kpi-sub" id="subAccum"></div>
+      </div>
+    </section>
+
+    <section class="analytics-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Maiores Gastos do Mês</h2>
+          <span>Top 5</span>
+        </div>
+        <div class="rank-list" id="rankList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Evolução Mensal</h2>
+          <span>Entradas × Saídas</span>
+        </div>
+        <div class="evo-chart" id="evoChart"></div>
+      </div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="ledger-card">
+        <div class="ledger-bar">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <strong style="font-size:0.8rem;" id="lblLedgerTitle">Extrato</strong>
+            <div class="pills">
+              <button type="button" class="pill active" onclick="setFilter('all', this)">Todos</button>
+              <button type="button" class="pill" onclick="setFilter('expenses', this)">Saídas</button>
+              <button type="button" class="pill" onclick="setFilter('recurring', this)">Recorrentes</button>
+              <button type="button" class="pill" onclick="setFilter('q1', this)">1ª Quinz.</button>
+              <button type="button" class="pill" onclick="setFilter('q2', this)">2ª Quinz.</button>
+              <button type="button" class="pill" onclick="setFilter('pending', this)">Pendentes</button>
+            </div>
+          </div>
+          <input type="text" class="search-box" id="qSearch" placeholder="Buscar item..." oninput="render()" />
+        </div>
+
+        <form class="quick-form" onsubmit="addItem(event)">
+          <input
+            type="text"
+            id="aDesc"
+            class="entry-input"
+            placeholder="Descrição"
+            title="Descrição do lançamento"
+            aria-label="Descrição do lançamento"
+            required
+          />
+          <input
+            type="number"
+            step="0.01"
+            min="0.01"
+            id="aAmt"
+            class="entry-input"
+            placeholder="Valor (0,00)"
+            title="Valor em reais"
+            aria-label="Valor em reais"
+            required
+          />
+          <select
+            id="aSign"
+            class="entry-select"
+            title="Tipo de lançamento"
+            aria-label="Tipo de lançamento"
+          >
+            <option value="-1">Saída (−)</option>
+            <option value="1">Entrada (+)</option>
+          </select>
+          <input
+            type="number"
+            min="1"
+            max="31"
+            id="aDay"
+            class="entry-input"
+            placeholder="Dia"
+            title="Dia do mês (1 a 31)"
+            aria-label="Dia do mês"
+            required
+          />
+          <input
+            type="number"
+            min="1"
+            max="60"
+            id="aParc"
+            class="entry-input"
+            placeholder="Parcelas"
+            title="Parcelas (opcional quando recorrente)"
+            aria-label="Parcelas"
+            required
+          />
+          <label class="rec-check" title="Repetir todos os meses automaticamente">
+            <input type="checkbox" id="aRec" onchange="syncParcRequirement()" />
+            <span>Recorrente</span>
+          </label>
+          <button type="submit" class="btn-emerald">+ Lançar</button>
+        </form>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:42px;text-align:center;">Pago</th>
+                <th style="width:66px;">Período</th>
+                <th style="width:42px;">Dia</th>
+                <th>Descrição</th>
+                <th style="width:76px;text-align:center;">Parcela</th>
+                <th style="width:124px;text-align:right;">Valor</th>
+                <th style="width:68px;text-align:right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <aside class="side-stack">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Alívio Próximo Mês</h2>
+            <span>Quitam agora</span>
+          </div>
+          <div class="relief-box">
+            <span>Valor liberado</span>
+            <strong id="reliefVal">R$ 0,00</strong>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;" id="endingList"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Simulador de Parcela</h2>
+            <span>Impacto</span>
+          </div>
+          <div class="sim-grid">
+            <div class="sim-f full">
+              <label for="sDesc">Descrição</label>
+              <input type="text" id="sDesc" class="sim-box-field" value="NOVA COMPRA" oninput="renderSim()" />
+            </div>
+            <div class="sim-f">
+              <label for="sVal">Parcela/mês (R$)</label>
+              <input type="number" step="0.01" min="0" id="sVal" class="sim-box-field" value="250" oninput="renderSim()" />
+            </div>
+            <div class="sim-f">
+              <label for="sParc">Parcelas</label>
+              <input type="number" min="1" max="36" id="sParc" class="sim-box-field" value="3" oninput="renderSim()" />
+            </div>
+            <div class="sim-f full">
+              <label for="sQuinz">Quinzena</label>
+              <select id="sQuinz" class="sim-box-field" onchange="renderSim()">
+                <option value="1">1ª Quinzena (01–15)</option>
+                <option value="2">2ª Quinzena (16–31)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="sim-out" id="simBox"></div>
+
+          <button type="button" class="btn-emerald" style="width:100%;" onclick="applySim()">
+            Efetivar no Orçamento
+          </button>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <!-- Modal Editar Lançamento -->
+  <div class="modal-bg" id="modalBg" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <strong style="font-size:0.88rem;">Editar Lançamento</strong>
+        <button type="button" class="act-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-grid">
+        <input type="text" id="mDesc" class="entry-input" style="grid-column:1/-1;" placeholder="Descrição" aria-label="Descrição" />
+        <input type="number" step="0.01" min="0.01" id="mAmt" class="entry-input" placeholder="Valor (0,00)" aria-label="Valor" />
+        <select id="mSign" class="entry-select" aria-label="Tipo">
+          <option value="-1">Saída (−)</option>
+          <option value="1">Entrada (+)</option>
+        </select>
+        <input type="number" min="1" max="31" id="mDay" class="entry-input" placeholder="Dia" aria-label="Dia" />
+        <select id="mPaid" class="entry-select" aria-label="Status">
+          <option value="false">Pendente</option>
+          <option value="true">Pago</option>
+        </select>
+        <label class="rec-check" style="grid-column:1/-1;">
+          <input type="checkbox" id="mRec" />
+          <span>Lançamento recorrente (repete nos próximos meses)</span>
+        </label>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:6px;">
+        <button type="button" class="act-btn" style="width:auto;height:28px;padding:0 10px;border:1px solid var(--border);" onclick="closeModal()">Cancelar</button>
+        <button type="button" class="btn-emerald" onclick="saveModal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Configurar / Alterar PIN -->
+  <div class="modal-bg" id="pinModalBg" onclick="if(event.target===this) closePinModal()">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <strong style="font-size:0.88rem;" id="pinModalTitle">Segurança por PIN</strong>
+        <button type="button" class="act-btn" onclick="closePinModal()">✕</button>
+      </div>
+      <p style="font-size:0.71rem;color:var(--ink-sec);line-height:1.35;" id="pinModalDesc">
+        Defina um PIN de 4 a 8 dígitos para proteger o acesso ao painel neste navegador.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input
+          type="password"
+          inputmode="numeric"
+          maxlength="8"
+          id="pinCurrentInput"
+          class="entry-input"
+          placeholder="PIN atual"
+          aria-label="PIN atual"
+          style="display:none;"
+        />
+        <input
+          type="password"
+          inputmode="numeric"
+          maxlength="8"
+          id="pinNewInput"
+          class="entry-input"
+          placeholder="Novo PIN (4 a 8 dígitos)"
+          aria-label="Novo PIN"
+        />
+        <input
+          type="password"
+          inputmode="numeric"
+          maxlength="8"
+          id="pinConfirmInput"
+          class="entry-input"
+          placeholder="Confirmar novo PIN"
+          aria-label="Confirmar novo PIN"
+        />
+        <input
+          type="text"
+          maxlength="40"
+          id="pinRecoveryInput"
+          class="entry-input"
+          placeholder="Palavra de recuperação (opcional, ex.: apelido)"
+          aria-label="Palavra de recuperação"
+        />
+        <div class="pin-err" id="pinModalErr"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+        <button
+          type="button"
+          class="act-btn del"
+          id="btnRemovePin"
+          style="width:auto;height:28px;padding:0 10px;display:none;"
+          onclick="removePin()"
+        >Remover PIN</button>
+        <div style="display:flex;gap:6px;margin-left:auto;">
+          <button type="button" class="act-btn" style="width:auto;height:28px;padding:0 10px;border:1px solid var(--border);" onclick="closePinModal()">Cancelar</button>
+          <button type="button" class="btn-emerald" onclick="savePin()">Salvar PIN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tela de Bloqueio -->
+  <div class="lock-screen" id="lockScreen" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+    <form class="lock-card" onsubmit="submitUnlock(event)">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title" id="lockTitle">FinControl Bloqueado</div>
+      <p class="lock-sub" id="lockSub">Digite seu PIN para desbloquear os lançamentos financeiros.</p>
+      <input
+        type="password"
+        inputmode="numeric"
+        maxlength="8"
+        id="unlockPinInput"
+        class="pin-input"
+        placeholder="••••"
+        aria-label="PIN de acesso"
+        autocomplete="off"
+      />
+      <div class="pin-err" id="lockErr"></div>
+      <div class="lock-actions">
+        <button type="submit" id="btnUnlockSubmit" class="btn-emerald" style="width:100%;height:34px;">Desbloquear</button>
+        <button type="button" class="btn-link-dim" onclick="toggleRecoveryPanel()">Esqueci o PIN</button>
+      </div>
+
+      <div class="recovery-panel" id="recoveryPanel">
+        <p style="font-size:0.69rem;color:var(--ink-sec);line-height:1.35;" id="recoveryPrompt">
+          Confirme para remover o PIN (seus lançamentos financeiros não serão apagados):
+        </p>
+        <input
+          type="text"
+          id="recoveryAnswerInput"
+          class="pin-input plain-confirm"
+          placeholder="Digite aqui"
+          aria-label="Confirmação para remover PIN"
+          autocomplete="off"
+        />
+        <div class="pin-err" id="recoveryErr"></div>
+        <div class="recovery-row">
+          <button type="button" class="act-btn" style="flex:1;height:28px;border:1px solid var(--border);" onclick="toggleRecoveryPanel(false)">Voltar</button>
+          <button type="button" class="btn-emerald" style="flex:1;height:28px;background:var(--grad-rose);" onclick="confirmForgotPin()">Remover PIN</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const MIN_KEY = '2026-11';
+    const ACCUM_START_KEY = '2026-11';
+    const END_2027_KEY = '2027-12';
+    const STORE = 'fincontrol_compact_v1';
+    const META_STORE = 'fincontrol_compact_meta_v1';
+    const THEME_STORE = 'fincontrol_theme_v1';
+    const PIN_STORE = 'fincontrol_pin_hash_v1';
+    const RECOVERY_STORE = 'fincontrol_recovery_hash_v1';
+    const PRIVACY_STORE = 'fincontrol_privacy_v1';
+    const SEED_VERSION = '2026-11-2027-12-demo-sem-dados-reais-v1';
+    const AUTO_LOCK_MS = 5 * 60 * 1000;
+    const MAX_PIN_ATTEMPTS = 5;
+    const COOLDOWN_MS = 30 * 1000;
+
+    // Dados fictícios de exemplo (sem dados pessoais ou lançamentos reais no código)
+    const RAW_SEED = {
+      "2026-11": {
+        "items": [
+          { "id": 1760000000001, "desc": "RECEITA EXEMPLO 1ªQ", "amount": 2500.0, "day": 10, "paid": false, "recurring": true },
+          { "id": 1760000000002, "desc": "RECEITA EXEMPLO 2ªQ", "amount": 2500.0, "day": 25, "paid": false, "recurring": true },
+          { "id": 1760000000003, "desc": "MORADIA EXEMPLO", "amount": -1200.0, "day": 10, "paid": false, "recurring": true },
+          { "id": 1760000000004, "desc": "INTERNET EXEMPLO", "amount": -120.0, "day": 20, "paid": false, "recurring": true },
+          { "id": 1760000000005, "desc": "COMPRA EXEMPLO 01/03", "amount": -300.0, "day": 15, "paid": false, "recurring": false }
+        ]
+      }
+    };
+
+    function isValidMonthKey(k) {
+      return typeof k === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(k) && k >= MIN_KEY;
+    }
+
+    function shiftM(k, n) {
+      const [y, m] = k.split('-').map(Number);
+      const t = y * 12 + (m - 1) + n;
+      return `${Math.floor(t / 12)}-${String((t % 12) + 1).padStart(2, '0')}`;
+    }
+
+    function diffMonths(startKey, endKey) {
+      const [y1, m1] = startKey.split('-').map(Number);
+      const [y2, m2] = endKey.split('-').map(Number);
+      return (y2 - y1) * 12 + (m2 - m1);
+    }
+
+    function normDesc(s) {
+      return String(s || '').trim().toUpperCase().replace(/\s+/g, ' ');
+    }
+
+    function dedupeItems(items) {
+      const seenExact = new Set();
+      const seenRecurring = new Set();
+      const out = [];
+
+      (items || []).forEach(it => {
+        const desc = normDesc(it.desc);
+        const amt = Number(it.amount || 0);
+        if (!desc) return;
+
+        const day = Math.min(31, Math.max(1, Number(it.day || 15)));
+        const rec = Boolean(it.recurring);
+
+        const exactKey = `${desc}|${amt.toFixed(2)}|${day}`;
+        if (seenExact.has(exactKey)) return;
+
+        if (rec) {
+          const recKey = `${desc}|${amt.toFixed(2)}|REC`;
+          if (seenRecurring.has(recKey)) return;
+          seenRecurring.add(recKey);
+        }
+
+        seenExact.add(exactKey);
+        out.push({
+          ...it,
+          desc,
+          amount: amt,
+          day,
+          paid: Boolean(it.paid),
+          recurring: rec
+        });
+      });
+
+      return out;
+    }
+
+    function sanitizeDbFromNov2026(targetDb) {
+      if (!targetDb || typeof targetDb !== 'object') return { [MIN_KEY]: { items: [] } };
+      const cleaned = {};
+      Object.keys(targetDb)
+        .filter(isValidMonthKey)
+        .sort()
+        .forEach(mk => {
+          cleaned[mk] = {
+            items: dedupeItems(targetDb[mk]?.items || [])
+          };
+        });
+      if (!cleaned[MIN_KEY]) {
+        cleaned[MIN_KEY] = { items: [] };
+      }
+      return cleaned;
+    }
+
+    function parseParc(desc) {
+      const m = desc.match(/\b(\d{1,3})\/(\d{1,3})\b/);
+      if (!m) return { name: desc, tag: null, current: null, total: null, last: false };
+      const c = parseInt(m[1], 10);
+      const t = parseInt(m[2], 10);
+      return {
+        name: desc.replace(m[0], '').replace(/\s{2,}/g, ' ').trim() || desc,
+        tag: m[0],
+        current: c,
+        total: t,
+        last: c === t
+      };
+    }
+
+    function hasSameInstallmentSeries(existingDesc, nextDesc) {
+      const a = normDesc(existingDesc);
+      const b = normDesc(nextDesc);
+      return a === b || a.replace(/\b\d{1,3}\/\d{1,3}\b/, '#') === b.replace(/\b\d{1,3}\/\d{1,3}\b/, '#');
+    }
+
+    function pushMonthlyItem(mk, entry) {
+      if (!isValidMonthKey(mk)) return;
+      if (!db[mk]) db[mk] = { items: [] };
+      db[mk].items.push(entry);
+    }
+
+    function buildSeedThrough2027() {
+      const out = {};
+      let cursor = MIN_KEY;
+      while (cursor <= END_2027_KEY) {
+        out[cursor] = { items: dedupeItems(RAW_SEED[cursor]?.items || []) };
+        cursor = shiftM(cursor, 1);
+      }
+
+      let idCounter = 1770000000000;
+      const monthKeys = Object.keys(out).sort();
+
+      monthKeys.forEach((mk, mIdx) => {
+        const currentItems = [...out[mk].items];
+
+        currentItems.forEach(it => {
+          const p = parseParc(it.desc);
+          if (p.current !== null && p.total !== null && p.current < p.total) {
+            const remaining = Math.min(p.total - p.current, monthKeys.length - 1 - mIdx);
+            for (let step = 1; step <= remaining; step++) {
+              const targetKey = monthKeys[mIdx + step];
+              const nextParc = p.current + step;
+              const nextTag = `${String(nextParc).padStart(2, '0')}/${String(p.total).padStart(2, '0')}`;
+              const nextDesc = normDesc(it.desc.replace(/\b\d{1,3}\/\d{1,3}\b/, nextTag));
+              const exists = out[targetKey].items.some(
+                x => hasSameInstallmentSeries(x.desc, nextDesc) && Number(x.amount) === Number(it.amount)
+              );
+              if (!exists) {
+                out[targetKey].items.push({
+                  id: idCounter++,
+                  desc: nextDesc,
+                  amount: Number(it.amount),
+                  day: Number(it.day),
+                  paid: false,
+                  recurring: false
+                });
+              }
+            }
+          }
+
+          if (it.recurring) {
+            for (let step = 1; step < monthKeys.length - mIdx; step++) {
+              const targetKey = monthKeys[mIdx + step];
+              const exists = out[targetKey].items.some(
+                x => normDesc(x.desc) === normDesc(it.desc) && Number(x.amount) === Number(it.amount)
+              );
+              if (!exists) {
+                out[targetKey].items.push({
+                  id: idCounter++,
+                  desc: normDesc(it.desc),
+                  amount: Number(it.amount),
+                  day: Number(it.day),
+                  paid: false,
+                  recurring: true
+                });
+              }
+            }
+          }
+        });
+      });
+
+      return sanitizeDbFromNov2026(out);
+    }
+
+    const SEED = buildSeedThrough2027();
+    let memoryDb = null;
+    let lastMenuSignature = '';
+    let isMonthDropdownOpen = false;
+    let hideValues = false;
+    let autoLockTimer = null;
+    let failedPinAttempts = 0;
+    let lockCooldownUntil = 0;
+    let cooldownInterval = null;
+
+    function readStorage(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || 'null');
+      } catch {
+        return null;
+      }
+    }
+
+    function writeStorage(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch {
+        // Fallback seguro
+      }
+    }
+
+    function getRawStorage(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    }
+
+    function setRawStorage(key, val) {
+      try {
+        if (val === null) localStorage.removeItem(key);
+        else localStorage.setItem(key, val);
+      } catch {
+        // Fallback seguro
+      }
+    }
+
+    function getSavedTheme() {
+      return getRawStorage(THEME_STORE) === 'dark' ? 'dark' : 'light';
+    }
+
+    function applyTheme(mode) {
+      const target = mode === 'dark' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', target);
+      document.querySelectorAll('.theme-opt').forEach(btn => {
+        const isActive = btn.getAttribute('data-mode') === target;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-pressed', String(isActive));
+      });
+      setRawStorage(THEME_STORE, target);
+    }
+
+    // --- Segurança: Modo Privacidade & Bloqueio por PIN ---
+    function loadPrivacyState() {
+      hideValues = getRawStorage(PRIVACY_STORE) === '1';
+      syncPrivacyButton();
+    }
+
+    function syncPrivacyButton() {
+      const btn = document.getElementById('btnPrivacy');
+      if (!btn) return;
+      btn.textContent = hideValues ? '🙈' : '👁️';
+      btn.title = hideValues ? 'Mostrar valores' : 'Ocultar valores';
+      btn.classList.toggle('active-privacy', hideValues);
+    }
+
+    function togglePrivacy() {
+      hideValues = !hideValues;
+      setRawStorage(PRIVACY_STORE, hideValues ? '1' : '0');
+      syncPrivacyButton();
+      render();
+    }
+
+    async function sha256Hex(text, prefix = 'fincontrol_salt_2026') {
+      const data = new TextEncoder().encode(`${prefix}::${text}`);
+      if (window.crypto && crypto.subtle) {
+        const hashBuf = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+      let h = 2166136261;
+      for (let i = 0; i < data.length; i++) {
+        h ^= data[i];
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0).toString(16).padStart(8, '0');
+    }
+
+    function hasPinConfigured() {
+      return Boolean(getRawStorage(PIN_STORE));
+    }
+
+    function hasRecoveryConfigured() {
+      return Boolean(getRawStorage(RECOVERY_STORE));
+    }
+
+    function syncLockButtons() {
+      const lockBtn = document.getElementById('btnLockNow');
+      const cfgBtn = document.getElementById('btnPinCfg');
+      const active = hasPinConfigured();
+      if (lockBtn) {
+        lockBtn.style.display = active ? 'inline-flex' : 'none';
+      }
+      if (cfgBtn) {
+        cfgBtn.title = active ? 'Alterar ou remover PIN' : 'Criar PIN de bloqueio';
+      }
+    }
+
+    function updateCooldownUI() {
+      const btn = document.getElementById('btnUnlockSubmit');
+      const err = document.getElementById('lockErr');
+      const now = Date.now();
+      if (lockCooldownUntil > now) {
+        const secs = Math.ceil((lockCooldownUntil - now) / 1000);
+        if (btn) btn.disabled = true;
+        if (err) err.textContent = `Muitas tentativas. Aguarde ${secs}s.`;
+        return true;
+      }
+      if (cooldownInterval) {
+        clearInterval(cooldownInterval);
+        cooldownInterval = null;
+      }
+      if (btn) btn.disabled = false;
+      if (err && err.textContent.startsWith('Muitas tentativas')) err.textContent = '';
+      return false;
+    }
+
+    function startCooldown() {
+      lockCooldownUntil = Date.now() + COOLDOWN_MS;
+      failedPinAttempts = 0;
+      updateCooldownUI();
+      if (cooldownInterval) clearInterval(cooldownInterval);
+      cooldownInterval = setInterval(updateCooldownUI, 500);
+    }
+
+    function lockApp() {
+      if (!hasPinConfigured()) {
+        openPinModal();
+        return;
+      }
+      closeMonthDropdown();
+      closeModal();
+      closePinModal();
+      toggleRecoveryPanel(false);
+      document.body.classList.add('app-locked');
+      const screen = document.getElementById('lockScreen');
+      const input = document.getElementById('unlockPinInput');
+      const err = document.getElementById('lockErr');
+      if (err) err.textContent = '';
+      if (input) input.value = '';
+      if (screen) screen.classList.add('open');
+      updateCooldownUI();
+      setTimeout(() => input && input.focus(), 40);
+    }
+
+    function unlockAppUI() {
+      failedPinAttempts = 0;
+      lockCooldownUntil = 0;
+      if (cooldownInterval) {
+        clearInterval(cooldownInterval);
+        cooldownInterval = null;
+      }
+      toggleRecoveryPanel(false);
+      document.body.classList.remove('app-locked');
+      const screen = document.getElementById('lockScreen');
+      if (screen) screen.classList.remove('open');
+      resetAutoLockTimer();
+    }
+
+    async function submitUnlock(e) {
+      e.preventDefault();
+      if (updateCooldownUI()) return;
+      const input = document.getElementById('unlockPinInput');
+      const err = document.getElementById('lockErr');
+      const pin = (input?.value || '').trim();
+      if (!pin) {
+        if (err) err.textContent = 'Digite seu PIN.';
+        return;
+      }
+      const savedHash = getRawStorage(PIN_STORE);
+      const enteredHash = await sha256Hex(pin);
+      if (enteredHash === savedHash) {
+        if (input) input.value = '';
+        if (err) err.textContent = '';
+        unlockAppUI();
+      } else {
+        failedPinAttempts += 1;
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+        if (failedPinAttempts >= MAX_PIN_ATTEMPTS) {
+          startCooldown();
+        } else if (err) {
+          err.textContent = `PIN incorreto (${failedPinAttempts}/${MAX_PIN_ATTEMPTS}).`;
+        }
+      }
+    }
+
+    function toggleRecoveryPanel(forceState) {
+      const panel = document.getElementById('recoveryPanel');
+      const prompt = document.getElementById('recoveryPrompt');
+      const ansInput = document.getElementById('recoveryAnswerInput');
+      const err = document.getElementById('recoveryErr');
+      if (!panel) return;
+      const nextOpen = typeof forceState === 'boolean' ? forceState : !panel.classList.contains('open');
+      panel.classList.toggle('open', nextOpen);
+      if (err) err.textContent = '';
+      if (ansInput) ansInput.value = '';
+      if (nextOpen) {
+        if (hasRecoveryConfigured()) {
+          if (prompt) prompt.textContent = 'Digite sua palavra de recuperação para remover o PIN:';
+          if (ansInput) ansInput.placeholder = 'Palavra de recuperação';
+        } else {
+          if (prompt) prompt.textContent = 'Sem palavra cadastrada. Digite RESETAR para remover o PIN:';
+          if (ansInput) ansInput.placeholder = 'Digite RESETAR';
+        }
+        setTimeout(() => ansInput && ansInput.focus(), 30);
+      }
+    }
+
+    async function confirmForgotPin() {
+      const ansInput = document.getElementById('recoveryAnswerInput');
+      const err = document.getElementById('recoveryErr');
+      const typed = (ansInput?.value || '').trim();
+      if (!typed) {
+        if (err) err.textContent = 'Preencha o campo de confirmação.';
+        return;
+      }
+
+      if (hasRecoveryConfigured()) {
+        const savedRecHash = getRawStorage(RECOVERY_STORE);
+        const typedHash = await sha256Hex(typed.toLowerCase(), 'fincontrol_rec_2026');
+        if (typedHash !== savedRecHash) {
+          if (err) err.textContent = 'Palavra de recuperação incorreta.';
+          return;
+        }
+      } else if (typed.toUpperCase() !== 'RESETAR') {
+        if (err) err.textContent = 'Digite exatamente RESETAR para confirmar.';
+        return;
+      }
+
+      setRawStorage(PIN_STORE, null);
+      setRawStorage(RECOVERY_STORE, null);
+      syncLockButtons();
+      unlockAppUI();
+    }
+
+    function openPinModal() {
+      const configured = hasPinConfigured();
+      document.getElementById('pinModalTitle').textContent = configured ? 'Alterar PIN de Bloqueio' : 'Criar PIN de Bloqueio';
+      document.getElementById('pinModalDesc').textContent = configured
+        ? 'Informe o PIN atual para definir um novo ou remover a proteção.'
+        : 'Defina um PIN de 4 a 8 dígitos para proteger o painel.';
+      const curEl = document.getElementById('pinCurrentInput');
+      const newEl = document.getElementById('pinNewInput');
+      const confEl = document.getElementById('pinConfirmInput');
+      const recEl = document.getElementById('pinRecoveryInput');
+      const remBtn = document.getElementById('btnRemovePin');
+      const errEl = document.getElementById('pinModalErr');
+
+      curEl.style.display = configured ? 'block' : 'none';
+      remBtn.style.display = configured ? 'inline-grid' : 'none';
+      curEl.value = '';
+      newEl.value = '';
+      confEl.value = '';
+      recEl.value = '';
+      errEl.textContent = '';
+      document.getElementById('pinModalBg').classList.add('open');
+      setTimeout(() => (configured ? curEl : newEl).focus(), 40);
+    }
+
+    function closePinModal() {
+      document.getElementById('pinModalBg').classList.remove('open');
+    }
+
+    async function savePin() {
+      const configured = hasPinConfigured();
+      const curVal = document.getElementById('pinCurrentInput').value.trim();
+      const newVal = document.getElementById('pinNewInput').value.trim();
+      const confVal = document.getElementById('pinConfirmInput').value.trim();
+      const recVal = document.getElementById('pinRecoveryInput').value.trim();
+      const errEl = document.getElementById('pinModalErr');
+
+      if (configured) {
+        const curHash = await sha256Hex(curVal);
+        if (curHash !== getRawStorage(PIN_STORE)) {
+          errEl.textContent = 'PIN atual incorreto.';
+          return;
+        }
+      }
+      if (!/^\d{4,8}$/.test(newVal)) {
+        errEl.textContent = 'O PIN deve ter de 4 a 8 números.';
+        return;
+      }
+      if (newVal !== confVal) {
+        errEl.textContent = 'A confirmação do PIN não confere.';
+        return;
+      }
+
+      const newHash = await sha256Hex(newVal);
+      setRawStorage(PIN_STORE, newHash);
+      if (recVal) {
+        const recHash = await sha256Hex(recVal.toLowerCase(), 'fincontrol_rec_2026');
+        setRawStorage(RECOVERY_STORE, recHash);
+      } else if (!configured) {
+        setRawStorage(RECOVERY_STORE, null);
+      }
+      syncLockButtons();
+      closePinModal();
+      resetAutoLockTimer();
+    }
+
+    async function removePin() {
+      const curVal = document.getElementById('pinCurrentInput').value.trim();
+      const errEl = document.getElementById('pinModalErr');
+      const curHash = await sha256Hex(curVal);
+      if (curHash !== getRawStorage(PIN_STORE)) {
+        errEl.textContent = 'Informe o PIN atual para remover.';
+        return;
+      }
+      setRawStorage(PIN_STORE, null);
+      setRawStorage(RECOVERY_STORE, null);
+      syncLockButtons();
+      closePinModal();
+      unlockAppUI();
+    }
+
+    function resetAutoLockTimer() {
+      if (autoLockTimer) clearTimeout(autoLockTimer);
+      if (!hasPinConfigured() || document.body.classList.contains('app-locked')) return;
+      autoLockTimer = setTimeout(() => {
+        if (hasPinConfigured()) lockApp();
+      }, AUTO_LOCK_MS);
+    }
+
+    ['click', 'keydown', 'touchstart'].forEach(evt => {
+      document.addEventListener(evt, resetAutoLockTimer, { passive: true });
+    });
+
+    // --- Banco de Dados (preserva alterações locais e importações) ---
+    function initDb() {
+      const savedDb = readStorage(STORE) || memoryDb;
+      const savedMeta = readStorage(META_STORE);
+
+      if (!savedDb) {
+        const fresh = sanitizeDbFromNov2026(JSON.parse(JSON.stringify(SEED)));
+        memoryDb = fresh;
+        writeStorage(STORE, fresh);
+        writeStorage(META_STORE, { seedVersion: SEED_VERSION });
+        return fresh;
+      }
+
+      const cleaned = sanitizeDbFromNov2026(savedDb);
+      memoryDb = cleaned;
+      writeStorage(STORE, cleaned);
+      if (!savedMeta || savedMeta.seedVersion !== SEED_VERSION) {
+        writeStorage(META_STORE, { seedVersion: SEED_VERSION });
+      }
+      return cleaned;
+    }
+
+    let db = initDb();
+    let currentMonth = MIN_KEY;
+    let filterMode = 'all';
+    let editId = null;
+
+    function syncParcRequirement() {
+      const recChecked = Boolean(document.getElementById('aRec')?.checked);
+      const parcEl = document.getElementById('aParc');
+      if (!parcEl) return;
+      parcEl.required = !recChecked;
+      parcEl.min = recChecked ? '0' : '1';
+      parcEl.placeholder = recChecked ? 'Recorrente' : 'Parcelas';
+    }
+
+    function persist() {
+      db = sanitizeDbFromNov2026(db);
+      memoryDb = db;
+      writeStorage(STORE, db);
+    }
+
+    function brl(v) {
+      if (hideValues) return 'R$ ••••';
+      return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function signedBrl(v) {
+      if (hideValues) return 'R$ ••••';
+      const n = Number(v || 0);
+      if (n > 0) return `+${brl(n)}`;
+      if (n < 0) return `-${brl(Math.abs(n))}`;
+      return brl(0);
+    }
+
+    function keysSorted() {
+      return Object.keys(db).filter(isValidMonthKey).sort();
+    }
+
+    function getMonthHalfFlows(monthKey) {
+      let q1In = 0, q1Out = 0, q2In = 0, q2Out = 0, pending = 0, expCount = 0;
+      (db[monthKey]?.items || []).forEach(it => {
+        const v = Number(it.amount || 0);
+        const day = Number(it.day || 15);
+        if (v < 0) expCount++;
+        if (v < 0 && !it.paid) pending += Math.abs(v);
+        if (day <= 15) {
+          if (v >= 0) q1In += v; else q1Out += v;
+        } else {
+          if (v >= 0) q2In += v; else q2Out += v;
+        }
+      });
+      const q1Net = q1In + q1Out;
+      const q2Net = q2In + q2Out;
+      const mIn = q1In + q2In;
+      const mOut = q1Out + q2Out;
+      const mNet = q1Net + q2Net;
+      return { q1In, q1Out, q1Net, q2In, q2Out, q2Net, mIn, mOut, mNet, pending, expCount };
+    }
+
+    function buildFortnightTimeline(sortedKeys = keysSorted()) {
+      const map = new Map();
+      let running = 0;
+
+      sortedKeys
+        .filter(mk => mk >= ACCUM_START_KEY)
+        .forEach(mk => {
+          const flows = getMonthHalfFlows(mk);
+          const isNov2026 = mk === ACCUM_START_KEY;
+          const prevMonthEndAccum = isNov2026 ? 0 : running;
+          const q1StartAccum = prevMonthEndAccum;
+          const q1EndAccum = q1StartAccum + flows.q1Net;
+
+          const q2StartAccum = isNov2026 ? 0 : q1EndAccum;
+          const q2EndAccum = q2StartAccum + flows.q2Net;
+          const monthEndAccum = q2EndAccum;
+          running = monthEndAccum;
+
+          map.set(mk, {
+            ...flows,
+            isNov2026,
+            prevMonthEndAccum,
+            q1StartAccum,
+            q1EndAccum,
+            q2StartAccum,
+            q2EndAccum,
+            monthEndAccum
+          });
+        });
+
+      return map;
+    }
+
+    function shortM(k) {
+      const [y, m] = k.split('-').map(Number);
+      return new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '').toUpperCase();
+    }
+
+    function longM(k) {
+      const [y, m] = k.split('-').map(Number);
+      const s = new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function positionMonthDropdown() {
+      const trigger = document.getElementById('monthTrigger');
+      const dropdown = document.getElementById('monthDropdown');
+      if (!trigger || !dropdown) return;
+      const rect = trigger.getBoundingClientRect();
+      const width = Math.max(rect.width, 184);
+      const left = Math.min(Math.max(8, rect.left), window.innerWidth - width - 8);
+      const top = Math.min(rect.bottom + 4, window.innerHeight - 268);
+      dropdown.style.width = `${width}px`;
+      dropdown.style.left = `${left}px`;
+      dropdown.style.top = `${Math.max(8, top)}px`;
+    }
+
+    function closeMonthDropdown() {
+      isMonthDropdownOpen = false;
+      const picker = document.getElementById('monthPicker');
+      const trigger = document.getElementById('monthTrigger');
+      if (picker) picker.classList.remove('open');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleMonthDropdown(e) {
+      if (e) e.stopPropagation();
+      const picker = document.getElementById('monthPicker');
+      const trigger = document.getElementById('monthTrigger');
+      if (!picker || !trigger) return;
+      isMonthDropdownOpen = !isMonthDropdownOpen;
+      picker.classList.toggle('open', isMonthDropdownOpen);
+      trigger.setAttribute('aria-expanded', String(isMonthDropdownOpen));
+      if (isMonthDropdownOpen) {
+        positionMonthDropdown();
+      }
+    }
+
+    function selectMonth(mk) {
+      if (!isValidMonthKey(mk)) return;
+      currentMonth = mk;
+      closeMonthDropdown();
+      render();
+    }
+
+    document.addEventListener('click', e => {
+      const picker = document.getElementById('monthPicker');
+      if (isMonthDropdownOpen && picker && !picker.contains(e.target)) {
+        closeMonthDropdown();
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (isMonthDropdownOpen) closeMonthDropdown();
+        if (document.getElementById('pinModalBg')?.classList.contains('open')) closePinModal();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (isMonthDropdownOpen) positionMonthDropdown();
+    });
+
+    window.addEventListener('scroll', () => {
+      if (isMonthDropdownOpen) positionMonthDropdown();
+    }, { passive: true });
+
+    function getMaxSyncMonthKey(fromMonth) {
+      const keys = keysSorted();
+      const lastKey = keys[keys.length - 1] || END_2027_KEY;
+      return lastKey > END_2027_KEY ? lastKey : (fromMonth <= END_2027_KEY ? END_2027_KEY : lastKey);
+    }
+
+    function removeFutureRecurringCopies(fromMonth, desc, amount) {
+      const normD = normDesc(desc);
+      const amt = Number(amount);
+      keysSorted()
+        .filter(k => k > fromMonth)
+        .forEach(k => {
+          db[k].items = (db[k]?.items || []).filter(
+            x => !(normDesc(x.desc) === normD && Number(x.amount) === amt)
+          );
+        });
+    }
+
+    function syncRecurringToTargetMonth(fromMonth, item, endKey = END_2027_KEY) {
+      if (!item.recurring) return;
+      const steps = Math.max(0, diffMonths(fromMonth, endKey));
+      for (let i = 1; i <= steps; i++) {
+        const mk = shiftM(fromMonth, i);
+        const exists = (db[mk]?.items || []).some(
+          x => normDesc(x.desc) === normDesc(item.desc) && Number(x.amount) === Number(item.amount)
+        );
+        if (!exists) {
+          pushMonthlyItem(mk, {
+            id: Date.now() + i + Math.floor(Math.random() * 900),
+            desc: normDesc(item.desc),
+            amount: Number(item.amount),
+            day: Number(item.day),
+            paid: false,
+            recurring: true
+          });
+        }
+      }
+    }
+
+    function renderMonthMenu(keys) {
+      const triggerLabel = document.getElementById('monthTriggerLabel');
+      const dropdown = document.getElementById('monthDropdown');
+      const seenMenuLabels = new Set();
+      const uniqueKeys = keys.filter(k => {
+        const label = longM(k);
+        if (seenMenuLabels.has(label)) return false;
+        seenMenuLabels.add(label);
+        return true;
+      });
+      const sig = `${uniqueKeys.join('|')}::${currentMonth}`;
+      if (sig !== lastMenuSignature && dropdown) {
+        lastMenuSignature = sig;
+        dropdown.innerHTML = uniqueKeys
+          .map(k => {
+            const active = k === currentMonth;
+            return `<button
+              type="button"
+              role="option"
+              aria-selected="${active}"
+              class="month-option ${active ? 'active' : ''}"
+              onclick="selectMonth('${k}')"
+            >
+              <span>${longM(k)}</span>
+              <span>${active ? '●' : ''}</span>
+            </button>`;
+          })
+          .join('');
+      }
+      if (triggerLabel) {
+        triggerLabel.textContent = longM(currentMonth);
+      }
+    }
+
+    function setFilter(f, btn) {
+      filterMode = f;
+      btn.parentElement.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    }
+
+    function setCardTone(cardId, val, defaultClass) {
+      const el = document.getElementById(cardId);
+      el.classList.remove('g-emerald', 'g-teal', 'g-indigo', 'g-rose');
+      el.classList.add(val < 0 ? 'g-rose' : defaultClass);
+    }
+
+    function render() {
+      persist();
+      syncParcRequirement();
+      const keys = keysSorted();
+      if (!keys.includes(currentMonth)) currentMonth = keys[0] || MIN_KEY;
+
+      const timeline = buildFortnightTimeline(keys);
+      const curState = timeline.get(currentMonth);
+      const prevAccum = curState.prevMonthEndAccum;
+
+      renderMonthMenu(keys);
+
+      document.getElementById('accumBadge').textContent = curState.isNov2026
+        ? `${shortM(currentMonth)} 2ªQ`
+        : `${shortM(ACCUM_START_KEY)}–${shortM(currentMonth)} 2ªQ`;
+
+      const items = [...(db[currentMonth]?.items || [])].sort((a, b) => {
+        const aIn = Number(a.amount || 0) >= 0 ? 1 : 0;
+        const bIn = Number(b.amount || 0) >= 0 ? 1 : 0;
+        if (aIn !== bIn) return bIn - aIn;
+        return a.day - b.day || b.amount - a.amount;
+      });
+
+      const { q1In, q1Out, q1Net, q2In, q2Out, q2Net, mIn, mOut, mNet, pending, expCount } = curState;
+      const q1Accum = curState.q1EndAccum;
+      const q2Accum = curState.q2EndAccum;
+      const mAccum = curState.monthEndAccum;
+
+      const ledgerEl = document.getElementById('lblLedgerTitle');
+      ledgerEl.textContent = `Extrato · ${shortM(currentMonth)}`;
+      ledgerEl.title = `${expCount} saídas em ${longM(currentMonth)}`;
+
+      document.getElementById('pillQ1').textContent = '01–15 · Acum.';
+      setCardTone('cardQ1', q1Accum, 'g-teal');
+      document.getElementById('valQ1').textContent = brl(q1Accum);
+      document.getElementById('subQ1').innerHTML = `<span>Início 1ªQ: ${signedBrl(curState.q1StartAccum)}</span><span>Quinz: ${signedBrl(q1Net)} (E:${brl(q1In)} S:${brl(Math.abs(q1Out))})</span>`;
+
+      document.getElementById('pillQ2').textContent = curState.isNov2026 ? '16–31 · Período' : '16–31 · Acum.';
+      setCardTone('cardQ2', q2Accum, 'g-emerald');
+      document.getElementById('valQ2').textContent = brl(q2Accum);
+      document.getElementById('subQ2').innerHTML = curState.isNov2026
+        ? `<span>Início 2ªQ: ${brl(0)} (isolado)</span><span>Período: ${signedBrl(q2Net)} (E:${brl(q2In)} S:${brl(Math.abs(q2Out))})</span>`
+        : `<span>Ant (1ªQ): ${signedBrl(curState.q2StartAccum)}</span><span>Quinz: ${signedBrl(q2Net)} (E:${brl(q2In)} S:${brl(Math.abs(q2Out))})</span>`;
+
+      setCardTone('cardMonth', mNet, 'g-indigo');
+      document.getElementById('valMonth').textContent = brl(mNet);
+      document.getElementById('pendBadge').textContent = `Pend: ${brl(pending)}`;
+      document.getElementById('subMonth').innerHTML = `<span>Ent: ${brl(mIn)}</span><span>Sai: ${brl(Math.abs(mOut))}</span>`;
+
+      setCardTone('cardAccum', mAccum, 'g-emerald');
+      document.getElementById('valAccum').textContent = brl(mAccum);
+      document.getElementById('subAccum').innerHTML = curState.isNov2026
+        ? `<span>Base próx. mês (Dez): ${signedBrl(mAccum)}</span><span>1ªQ: ${signedBrl(q1Accum)} | 2ªQ: ${signedBrl(q2Accum)}</span>`
+        : `<span>Início mês: ${signedBrl(prevAccum)}</span><span>1ªQ→2ªQ: ${signedBrl(q1Accum)}→${signedBrl(q2Accum)}</span>`;
+
+      const groups = {};
+      items.filter(it => it.amount < 0).forEach(it => {
+        const clean = parseParc(it.desc).name;
+        groups[clean] = (groups[clean] || 0) + Math.abs(it.amount);
+      });
+      const top5 = Object.entries(groups).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const maxVal = top5[0]?.[1] || 1;
+
+      document.getElementById('rankList').innerHTML = top5.map(([name, val]) => {
+        const w = Math.max(8, Math.round((val / maxVal) * 100));
+        return `<div class="rank-row">
+          <div class="rank-info"><span>${name}</span><span>${brl(val)}</span></div>
+          <div class="rank-track"><div class="rank-fill" style="width:${w}%"></div></div>
+        </div>`;
+      }).join('');
+
+      const allStats = keys.map(k => {
+        const st = timeline.get(k);
+        return { k, inc: st.mIn, out: Math.abs(st.mOut), q1Accum: st.q1EndAccum, q2Accum: st.q2EndAccum, isNov2026: st.isNov2026 };
+      });
+      const maxBar = Math.max(1, ...allStats.flatMap(x => [x.inc, x.out]));
+
+      document.getElementById('evoChart').innerHTML = allStats.map(st => {
+        const hIn = Math.max(5, Math.round((st.inc / maxBar) * 64));
+        const hOut = Math.max(5, Math.round((st.out / maxBar) * 64));
+        const q2Label = st.isNov2026 ? '2ªQ Período' : '2ªQ Acum';
+        const tip = hideValues
+          ? `${shortM(st.k)} — Valores ocultos`
+          : `${shortM(st.k)} — Entradas: ${brl(st.inc)} | 1ªQ Acum: ${signedBrl(st.q1Accum)} | ${q2Label}: ${signedBrl(st.q2Accum)}`;
+        return `<div class="evo-col">
+          <div class="evo-bars">
+            <div class="bar-in" style="height:${hIn}px" title="${tip}"></div>
+            <div class="bar-out" style="height:${hOut}px" title="${tip}"></div>
+          </div>
+          <span class="evo-lbl">${shortM(st.k)}</span>
+        </div>`;
+      }).join('');
+
+      const q = document.getElementById('qSearch').value.trim().toLowerCase();
+      const rows = items.filter(it => {
+        if (q && !it.desc.toLowerCase().includes(q)) return false;
+        if (filterMode === 'expenses' && it.amount >= 0) return false;
+        if (filterMode === 'recurring' && !it.recurring) return false;
+        if (filterMode === 'q1' && it.day > 15) return false;
+        if (filterMode === 'q2' && it.day <= 15) return false;
+        if (filterMode === 'pending' && it.paid) return false;
+        return true;
+      });
+
+      document.getElementById('tbody').innerHTML = rows.length
+        ? rows.map(it => {
+            const p = parseParc(it.desc);
+            const parcBadge = p.tag
+              ? `<span class="tag-p ${p.last ? 'end' : ''}">${p.tag}</span>`
+              : it.recurring
+                ? `<span class="tag-p rec" title="Lançamento recorrente">↻ Fixo</span>`
+                : '—';
+            return `<tr class="${it.paid ? 'paid' : ''}">
+              <td style="text-align:center;"><input type="checkbox" ${it.paid ? 'checked' : ''} onchange="togglePaid(${it.id})" /></td>
+              <td><span class="tag-q">${it.day <= 15 ? '1ª Q.' : '2ª Q.'}</span></td>
+              <td style="color:var(--ink-sec);font-weight:700;">${String(it.day).padStart(2, '0')}</td>
+              <td class="desc-c" style="font-weight:600;" title="${p.name}">${p.name}</td>
+              <td style="text-align:center;">${parcBadge}</td>
+              <td class="val-c" style="text-align:right;font-weight:700;"><span class="${it.amount >= 0 ? 'c-pos' : 'c-neg'}">${brl(it.amount)}</span></td>
+              <td class="act-c">
+                <button type="button" class="act-btn" title="Editar lançamento" onclick="openEdit(${it.id})">✎</button>
+                <button type="button" class="act-btn del" title="Excluir lançamento" aria-label="Excluir lançamento" onclick="delItem(${it.id})">✕</button>
+              </td>
+            </tr>`;
+          }).join('')
+        : `<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--ink-dim);">Nenhum lançamento encontrado.</td></tr>`;
+
+      const ending = items.filter(it => it.amount < 0 && !it.recurring && parseParc(it.desc).last);
+      const relief = ending.reduce((s, it) => s + Math.abs(it.amount), 0);
+      document.getElementById('reliefVal').textContent = brl(relief);
+      document.getElementById('endingList').innerHTML = ending.length
+        ? ending.map(it => {
+            const p = parseParc(it.desc);
+            return `<div class="end-item">
+              <span>${p.name} <small style="color:var(--ink-dim);">(${p.tag})</small></span>
+              <span>${brl(Math.abs(it.amount))}</span>
+            </div>`;
+          }).join('')
+        : `<p style="font-size:0.71rem;color:var(--ink-dim);">Nenhuma parcela encerra neste mês.</p>`;
+
+      renderSim();
+    }
+
+    function renderSim() {
+      const val = Math.abs(parseFloat(document.getElementById('sVal').value)) || 0;
+      const parc = Math.min(36, Math.max(1, parseInt(document.getElementById('sParc').value, 10) || 1));
+      const qTarget = parseInt(document.getElementById('sQuinz').value, 10);
+      const box = document.getElementById('simBox');
+
+      if (val <= 0) {
+        box.innerHTML = `<span style="color:var(--ink-sec);">Informe um valor mensal para simular.</span>`;
+        return;
+      }
+
+      const timeline = buildFortnightTimeline();
+      let lines = '';
+      for (let i = 0; i < Math.min(parc, 3); i++) {
+        const mk = shiftM(currentMonth, i);
+        const st = timeline.get(mk);
+        const baseQ = st
+          ? (qTarget === 1 ? st.q1EndAccum : st.q2EndAccum)
+          : 0;
+        const afterQ = baseQ - val;
+        const suffix = qTarget === 2 && mk === ACCUM_START_KEY ? 'Período' : 'Acum.';
+        lines += `<div class="sim-r">
+          <span>${shortM(mk)} ${qTarget}ªQ ${suffix} (${i + 1}/${parc})</span>
+          <span>${signedBrl(baseQ)} → <strong class="${afterQ >= 0 ? 'c-pos' : 'c-neg'}">${signedBrl(afterQ)}</strong></span>
+        </div>`;
+      }
+
+      box.innerHTML = `
+        <div><strong>-${brl(val)}/mês</strong> · <strong>${qTarget}ªQ</strong> (Tot: ${brl(val * parc)})</div>
+        ${lines}
+      `;
+    }
+
+    function applySim() {
+      const desc = normDesc(document.getElementById('sDesc').value || 'SIMULAÇÃO');
+      const val = Math.abs(parseFloat(document.getElementById('sVal').value));
+      const parc = Math.min(36, Math.max(1, parseInt(document.getElementById('sParc').value, 10) || 1));
+      const day = parseInt(document.getElementById('sQuinz').value, 10) === 1 ? 15 : 30;
+      if (!val || isNaN(val)) return;
+
+      for (let i = 0; i < parc; i++) {
+        const mk = shiftM(currentMonth, i);
+        const suffix = parc > 1 ? ` ${String(i + 1).padStart(2, '0')}/${String(parc).padStart(2, '0')}` : '';
+        pushMonthlyItem(mk, { id: Date.now() + i, desc: desc + suffix, amount: -val, day, paid: false, recurring: false });
+      }
+      render();
+    }
+
+    function addItem(e) {
+      e.preventDefault();
+      const desc = normDesc(document.getElementById('aDesc').value);
+      const amt = Math.abs(parseFloat(document.getElementById('aAmt').value));
+      const sign = parseInt(document.getElementById('aSign').value, 10);
+      const day = Math.min(31, Math.max(1, parseInt(document.getElementById('aDay').value, 10) || 15));
+      const recurring = Boolean(document.getElementById('aRec').checked);
+      const rawParc = document.getElementById('aParc').value.trim();
+      const parc = rawParc === '' && recurring
+        ? 1
+        : Math.min(60, Math.max(1, parseInt(rawParc, 10) || 1));
+      if (!desc || isNaN(amt)) return;
+
+      const baseId = Date.now();
+      const firstDesc = parc > 1 ? `${desc} 01/${String(parc).padStart(2, '0')}` : desc;
+      const firstItem = { id: baseId, desc: firstDesc, amount: sign * amt, day, paid: false, recurring };
+      pushMonthlyItem(currentMonth, firstItem);
+
+      for (let i = 1; i < parc; i++) {
+        const mk = shiftM(currentMonth, i);
+        const suffix = ` ${String(i + 1).padStart(2, '0')}/${String(parc).padStart(2, '0')}`;
+        pushMonthlyItem(mk, { id: baseId + i, desc: desc + suffix, amount: sign * amt, day, paid: false, recurring });
+      }
+
+      if (recurring) {
+        syncRecurringToTargetMonth(currentMonth, firstItem, getMaxSyncMonthKey(currentMonth));
+      }
+
+      document.getElementById('aDesc').value = '';
+      document.getElementById('aAmt').value = '';
+      document.getElementById('aDay').value = '';
+      document.getElementById('aParc').value = '';
+      document.getElementById('aRec').checked = false;
+      syncParcRequirement();
+      render();
+    }
+
+    function togglePaid(id) {
+      const it = (db[currentMonth]?.items || []).find(x => x.id === id);
+      if (it) { it.paid = !it.paid; render(); }
+    }
+
+    function delItem(id) {
+      const monthItems = db[currentMonth]?.items || [];
+      const target = monthItems.find(x => x.id === id);
+      if (!target) return;
+
+      let removeFuture = false;
+      if (target.recurring) {
+        removeFuture = confirm(
+          `Excluir "${target.desc}" também nos meses seguintes?\n\nOK = Exclui deste mês e dos próximos\nCancelar = Exclui apenas de ${shortM(currentMonth)}`
+        );
+      }
+
+      db[currentMonth].items = monthItems.filter(x => x.id !== id);
+
+      if (removeFuture) {
+        removeFutureRecurringCopies(currentMonth, target.desc, target.amount);
+      }
+
+      render();
+    }
+
+    function openEdit(id) {
+      const it = (db[currentMonth]?.items || []).find(x => x.id === id);
+      if (!it) return;
+      editId = id;
+      document.getElementById('mDesc').value = it.desc;
+      document.getElementById('mAmt').value = Math.abs(it.amount);
+      document.getElementById('mSign').value = it.amount >= 0 ? '1' : '-1';
+      document.getElementById('mDay').value = it.day;
+      document.getElementById('mPaid').value = String(it.paid);
+      document.getElementById('mRec').checked = Boolean(it.recurring);
+      document.getElementById('modalBg').classList.add('open');
+    }
+
+    function closeModal() {
+      editId = null;
+      document.getElementById('modalBg').classList.remove('open');
+    }
+
+    function saveModal() {
+      const it = (db[currentMonth]?.items || []).find(x => x.id === editId);
+      if (!it) return;
+      const desc = normDesc(document.getElementById('mDesc').value);
+      const amt = Math.abs(parseFloat(document.getElementById('mAmt').value));
+      if (!desc || isNaN(amt)) return;
+
+      const oldDesc = it.desc;
+      const oldAmount = it.amount;
+      const wasRecurring = Boolean(it.recurring);
+
+      it.desc = desc;
+      it.amount = parseInt(document.getElementById('mSign').value, 10) * amt;
+      it.day = Math.min(31, Math.max(1, parseInt(document.getElementById('mDay').value, 10) || 15));
+      it.paid = document.getElementById('mPaid').value === 'true';
+      it.recurring = Boolean(document.getElementById('mRec').checked);
+
+      if (wasRecurring && (!it.recurring || oldDesc !== it.desc || Number(oldAmount) !== Number(it.amount))) {
+        removeFutureRecurringCopies(currentMonth, oldDesc, oldAmount);
+      }
+
+      if (it.recurring) {
+        syncRecurringToTargetMonth(currentMonth, it, getMaxSyncMonthKey(currentMonth));
+      }
+      closeModal();
+      render();
+    }
+
+    function addMonth() {
+      const keys = keysSorted();
+      const prevKey = keys[keys.length - 1] || MIN_KEY;
+      const nk = shiftM(prevKey, 1);
+      if (!db[nk]) db[nk] = { items: [] };
+      const prevRecurring = (db[prevKey]?.items || []).filter(x => x.recurring);
+      prevRecurring.forEach((it, idx) => {
+        const exists = db[nk].items.some(
+          x => normDesc(x.desc) === normDesc(it.desc) && Number(x.amount) === Number(it.amount)
+        );
+        if (!exists) {
+          pushMonthlyItem(nk, {
+            id: Date.now() + idx + Math.floor(Math.random() * 900),
+            desc: normDesc(it.desc),
+            amount: Number(it.amount),
+            day: Number(it.day),
+            paid: false,
+            recurring: true
+          });
+        }
+      });
+      currentMonth = nk;
+      render();
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(sanitizeDbFromNov2026(db), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'fincontrol_nov2026_dez2027.json';
+      a.click();
+    }
+
+    function importJson(e) {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        try {
+          db = sanitizeDbFromNov2026(JSON.parse(ev.target.result));
+          currentMonth = MIN_KEY;
+          render();
+        } catch { alert('Arquivo JSON inválido.'); }
+      };
+      r.readAsText(f);
+    }
+
+    function resetSeed() {
+      if (!confirm('Restaurar dados fictícios de exemplo (Nov/2026 a Dez/2027)?')) return;
+      db = JSON.parse(JSON.stringify(SEED));
+      memoryDb = db;
+      currentMonth = MIN_KEY;
+      render();
+    }
+
+    applyTheme(getSavedTheme());
+    loadPrivacyState();
+    syncLockButtons();
+    render();
+    if (hasPinConfigured()) {
+      lockApp();
+    }
+  </script>
+</body>
+</html>
